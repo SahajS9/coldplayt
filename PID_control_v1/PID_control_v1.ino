@@ -76,7 +76,7 @@ void loop() {
 
   delay(1000); // Adjust delay as needed
 }
-hello world
+// hello world
 
 // Function to read temperature from a thermistor
 float readThermistor(int pin) {
