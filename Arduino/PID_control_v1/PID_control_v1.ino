@@ -133,3 +133,87 @@ float calculateHeatFlux()
   float heatFlux = -thermalConductivity * (dT / dx);
   return heatFlux;
 }
+// Define the analog pin connected to the pressure transducer
+const int pressureSensorPin = A0;
+
+// Define the voltage range and pressure range
+const float voltageMin = 0.5;  // Minimum voltage output (0 PSI)
+const float voltageMax = 4.5;  // Maximum voltage output (200 PSI)
+const float pressureMin = 0;   // Minimum pressure (PSI)
+const float pressureMax = 200; // Maximum pressure (PSI)
+
+
+// reading the pressure transducer readings
+void setup() {
+  // Initialize serial communication for debugging
+  Serial.begin(9600);
+}
+
+void loop() {
+  // Read the analog value from the pressure transducer
+  int sensorValue = analogRead(pressureSensorPin);
+
+  // Convert the analog reading to voltage (0V to 5V)
+  float voltage = sensorValue * (5.0 / 1023.0);
+
+  // Map the voltage to the pressure range
+  float pressure = mapPressure(voltage, voltageMin, voltageMax, pressureMin, pressureMax);
+
+  // Print the pressure value to the Serial Monitor
+  Serial.print("Pressure: ");
+  Serial.print(pressure);
+  Serial.println(" PSI");
+
+  // Wait for a short period before the next reading
+  delay(500);
+}
+
+// Function to map voltage to pressure
+float mapPressure(float voltage, float voltageMin, float voltageMax, float pressureMin, float pressureMax) {
+  // Ensure the voltage is within the expected range
+  voltage = constrain(voltage, voltageMin, voltageMax);
+
+  // Map the voltage to the pressure range
+  return (voltage - voltageMin) * (pressureMax - pressureMin) / (voltageMax - voltageMin) + pressureMin;
+}
+//reading in arduino 
+// Define analog pins for the thermistors
+const int thermistorPins[] = {A0, A1, A2, A3, A4};
+const int numThermistors = 5;
+
+void setup() {
+  // Initialize serial communication
+  Serial.begin(9600);
+}
+
+void loop() {
+  // Read temperature from each thermistor
+  for (int i = 0; i < numThermistors; i++) {
+    int sensorValue = analogRead(thermistorPins[i]);
+    float voltage = sensorValue * (5.0 / 1023.0); // Convert analog reading to voltage
+    float temperature = readTemperature(voltage); // Convert voltage to temperature
+    Serial.print(temperature); // Send temperature to serial
+    if (i < numThermistors - 1) {
+      Serial.print(","); // Separate values with a comma
+    }
+  }
+  Serial.println(); // End of line
+  delay(1000); // Wait for 1 second before the next reading
+}
+
+// Function to convert voltage to temperature (example for a 10k NTC thermistor)
+float readTemperature(float voltage) {
+  // Thermistor parameters (adjust based on your thermistor specifications)
+  float R1 = 10000; // Resistance of the fixed resistor in the voltage divider
+  float Beta = 3950; // Beta value of the thermistor
+  float T0 = 298.15; // Reference temperature in Kelvin (25°C)
+  float R0 = 10000; // Resistance of the thermistor at T0
+
+  // Calculate thermistor resistance
+  float Rt = R1 * (5.0 / voltage - 1.0);
+
+  // Calculate temperature using the Steinhart-Hart equation
+  float T = 1.0 / (1.0/T0 + (1.0/Beta) * log(Rt/R0)); // Temperature in Kelvin
+  float Tc = T - 273.15; // Convert to Celsius
+  return Tc;
+}
