@@ -1,4 +1,4 @@
-// Constants for the thermistor
+// Constants for the thermistors
 const float R_FIXED = 51000.0;             // 10kΩ fixed resistor
 const float THERMISTOR_NOMINAL = 100000.0; // Thermistor nominal resistance at 25°C (100kΩ)
 const float TEMPERATURE_NOMINAL = 25.0;    // Nominal temperature (25°C)
@@ -10,6 +10,7 @@ const int THERMISTOR_PIN3 = A2;            // Analog pin connected to thermistor
 void setup()
 {
     Serial.begin(19200); // Initialize serial communication
+    Serial.println("Running three_thermistors.ino")
 }
 
 void loop()
@@ -26,17 +27,15 @@ float readThermistor(int THERMISTOR)
 {
     // Read the analog value from the thermistor
     int sensorValue = analogRead(THERMISTOR);
-
     // Convert the analog reading to resistance
     float resistance = R_FIXED / (1023.0 / sensorValue - 1.0);
-
     // Calculate temperature using the Steinhart-Hart equation
     float temperature = calculateTemperature(resistance);
-
     // Output the temperature to the Serial Monitor
-    Serial.print("Raw value: ");
-    Serial.print(sensorValue);
-    Serial.print(" Temperature for ");
+    // Serial.print("Raw value: ");
+    // Serial.print(sensorValue);
+    // Serial.print(" Temperature for ");
+    Serial.print("Temperature for ");
     Serial.print(THERMISTOR);
     Serial.print(": ");
     Serial.print(temperature);
