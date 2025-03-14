@@ -7,7 +7,7 @@ const int THERMISTOR_PIN = A0;             // Analog pin connected to the thermi
 
 void setup()
 {
-    Serial.begin(9600); // Initialize serial communication
+    Serial.begin(19200); // Initialize serial communication
 }
 
 void loop()
@@ -22,6 +22,8 @@ void loop()
     float temperature = calculateTemperature(resistance);
 
     // Output the temperature to the Serial Monitor
+    // Serial.print("Raw value: ");
+    // Serial.print(sensorValue);
     Serial.print("Temperature: ");
     Serial.print(temperature);
     Serial.println(" °C");

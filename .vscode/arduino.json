@@ -1,5 +1,5 @@
 {
     "board": "arduino:avr:uno",
-    "sketch": "main/main.ino",
+    "sketch": "Arduino\\three_thermistors\\three_thermistors.ino",
     "port": "COM4"
 }
