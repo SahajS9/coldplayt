@@ -10,16 +10,19 @@ const int THERMISTOR_PIN3 = A2;            // Analog pin connected to thermistor
 void setup()
 {
     Serial.begin(19200); // Initialize serial communication
-    Serial.println("Running three_thermistors.ino")
+    // Serial.println("Running three_thermistors.ino");
 }
 
 void loop()
 {
     readThermistor(THERMISTOR_PIN);
+    // Serial.print("\n");
     readThermistor(THERMISTOR_PIN2);
+    // Serial.print("\n");
     readThermistor(THERMISTOR_PIN3);
+    Serial.print("\n");
 
-    delay(1000); // Wait 1 second before the next reading
+    delay(200); // Wait 1 second before the next reading
 }
 
 // Thermistor read function, calls Steinhart function
@@ -31,15 +34,21 @@ float readThermistor(int THERMISTOR)
     float resistance = R_FIXED / (1023.0 / sensorValue - 1.0);
     // Calculate temperature using the Steinhart-Hart equation
     float temperature = calculateTemperature(resistance);
-    // Output the temperature to the Serial Monitor
-    // Serial.print("Raw value: ");
-    // Serial.print(sensorValue);
-    // Serial.print(" Temperature for ");
-    Serial.print("Temperature for ");
-    Serial.print(THERMISTOR);
-    Serial.print(": ");
+
+    // Outputs for serial monitor
+    // // Output the temperature to the Serial Monitor
+    // // Serial.print("Raw value: ");
+    // // Serial.print(sensorValue);
+    // // Serial.print(" Temperature for ");
+    // Serial.print("Temperature for ");
+    // Serial.print(THERMISTOR);
+    // Serial.print(": ");
+    // Serial.print(temperature);
+    // Serial.println(" °C");
+
+    // Outputs for serial plotter
     Serial.print(temperature);
-    Serial.println(" °C");
+    Serial.print(" ");
 }
 
 // Function to calculate temperature from resistance using the Steinhart-Hart equation
