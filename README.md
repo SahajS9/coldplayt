@@ -11,6 +11,19 @@ Raspberry Pi/
 ├── README.md            # This file
 ```
 
+---
+
+## To-do:
+
+- Measure flow rate (or provide it)
+- Graph pump power vs heat flux
+- Graph efficiency
+- Record/calculate pressure drop between different fin geometries
+- Graph deltas (power in vs power out, pressure in vs pressure out, etc.)
+- Calibrate thermistor using coefficients in config, or using thermocouples if attached to rPi
+
+---
+
 ## 1. Basic Temperature Logging
 
 Goal: Log and view real-time temperatures
@@ -73,7 +86,8 @@ python main.py
 #### 2. Analyze Data
 
 ```bash
-python analyze.py
+python analyze.py                # Uses 'latest.csv' by default
+python analyze.py myfile.csv     # Uses 'myfile.csv' if provided
 ```
 
 - Computes temperature, heat transfer, and optionally efficiency/pump power.

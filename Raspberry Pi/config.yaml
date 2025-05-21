@@ -13,8 +13,10 @@ sensors:
 
 calibration:
   thermistor:
-    R0: 10000
-    T0: 298.16
-    B: 3950
+    R_fixed: 51000.0 # Fixed resistor value in ohms
+    R_nominal: 100000.0 # Thermistor nominal resistance at 25C (ohms)
+    T_nominal: 25.0 # Nominal temperature (°C)
+    beta: 3950.0 # Beta coefficient
+    adc_max: 1023.0 # ADC max reading (10-bit)
   pressure_scale: 0.1 # volts to bar
   voltage_ref: 3.3
