@@ -1,13 +1,15 @@
 # coldplayt
 
-Raspberry Pi/ # Monitoring suite for testing in the lab using the rPi 4
-├── main.py # Entry point for live collection and plotting
-├── config.yaml # Sensor channel mappings, calibration constants
-├── collect.py # Functions for analog data acquisition
-├── compute.py # Thermodynamic/fluids computations
-├── plot_realtime.py # Live visualization module
-├── analyze.py # Post-run analysis and plots
-└── utils.py # Helper functions (e.g., timestamping, logging)
+```
+Raspberry Pi/
+├── main.py              # Live data collection
+├── collect.py           # Analog reading logic
+├── compute.py           # Thermo/fluids computations
+├── plot_realtime.py     # Real-time temperature plotting
+├── analyze.py           # Post-processing of results
+├── config.yaml          # Sensor mapping and calibration
+├── README.md            # This file
+```
 
 ## 1. Basic Temperature Logging
 
@@ -49,8 +51,58 @@ Steps:
 
 ---
 
-## Notes
+### Features
+
+- Live data logging from MCP3008 ADC.
+- Optional support for heater and pump power sensors.
+- Saves data as timestamped CSV.
+- Real-time plotting.
+- Post-run analysis and thermodynamic calculations.
+
+---
+
+#### 1. Basic Temperature Logging
+
+```bash
+python main.py
+```
+
+- Logs data to `data_<timestamp>.csv`.
+- Real-time plot: `python plot_realtime.py`
+
+#### 2. Analyze Data
+
+```bash
+python analyze.py
+```
+
+- Computes temperature, heat transfer, and optionally efficiency/pump power.
+- Outputs line plots using `matplotlib` and `seaborn`.
+
+### Optional Sensor Logic
+
+- Heater power and pump power sensors are **optional**.
+- If not included, the system will continue logging and analyzing the available data.
+- Post-analysis functions gracefully skip calculations with missing inputs.
+
+### Note
 
 - All analog sensors must be connected to MCP3008 (or similar ADC).
 - If a sensor is not connected, leave its channel out of `config.yaml`.
 - CSV files are timestamped for easy archiving.
+
+### Sample Data
+
+Use the provided sample CSV file `sample_data.csv` to test plotting and analysis scripts.
+
+### Requirements
+
+- Raspberry Pi with MCP3008 ADC
+- Python 3.7+
+- Libraries: `spidev`, `matplotlib`, `pandas`, `numpy`, `seaborn`, `pyyaml`
+
+Install required packages:
+
+```bash
+pip install matplotlib pandas numpy seaborn pyyaml
+```
