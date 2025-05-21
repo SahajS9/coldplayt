@@ -14,7 +14,7 @@ sensors:
 calibration:
   thermistor:
     R0: 10000
-    T0: 298.15
+    T0: 298.16
     B: 3950
   pressure_scale: 0.1 # volts to bar
   voltage_ref: 3.3
