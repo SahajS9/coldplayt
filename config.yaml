@@ -3,11 +3,11 @@ sensors:
     T1: 0
     T2: 1
     T3: 2
-    fluid_in: 3
-    fluid_out: 4
+    fluid_in: 6
+    fluid_out: 7
   pressure:
-    in: 5
-    out: 6
+    in: 4
+    out: 5
   heater_power: 7 # Optional
   pump_power: 7 # Optional
 
@@ -19,7 +19,7 @@ calibration:
     beta: 3950.0 # Beta coefficient
     adc_max: 1023.0 # ADC max reading (10-bit)
   pressure_scale: 0.1 # volts to bar
-  voltage_ref: 3.3
+  voltage_ref: 5
   adc_max: 1023
   flow_rate_m3s: 0.0001 # Optional: used in pump power calc if not dynamically measured
 
