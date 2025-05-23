@@ -18,7 +18,13 @@ from compute import (
 if len(sys.argv) > 1: # Read argument if any
     csv_file = sys.argv[1]
 else: # Default to latest.csv if no argument given
-    csv_file = "latest.csv"
+    def get_latest_csv():
+        csv_files = glob.glob("data_*.csv")
+    if not csv_files:
+        return None
+    latest = max(csv_files, key=os.path.getmtime)
+    return latest
+    csv_file = latest
 print(f"Analyzing file: {csv_file}")
 
 try: # Load data
