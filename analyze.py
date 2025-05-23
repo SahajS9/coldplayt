@@ -5,6 +5,7 @@ import seaborn as sns
 import numpy as np
 import yaml
 from datetime import datetime
+from plot_realtime import get_latest_csv
 from compute import (
     adc_to_temperature,
     calculate_heat_transfer,
@@ -18,13 +19,8 @@ from compute import (
 if len(sys.argv) > 1: # Read argument if any
     csv_file = sys.argv[1]
 else: # Default to latest.csv if no argument given
-    def get_latest_csv():
-        csv_files = glob.glob("data_*.csv")
-    if not csv_files:
-        return None
-    latest = max(csv_files, key=os.path.getmtime)
-    return latest
-    csv_file = latest
+    dsv_file = get_latest_csv()
+    
 print(f"Analyzing file: {csv_file}")
 
 try: # Load data
