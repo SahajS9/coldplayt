@@ -54,7 +54,7 @@ def animate(i):
 
         ax_pressure.clear()
         ax_pressure.plot(df['timestamp'], df['P_in'], label="P_in")
-        ax_pressure.plot(df['timestamp'], df['P_out'], la   bel="P_out")
+        ax_pressure.plot(df['timestamp'], df['P_out'], label="P_out")
         ax_pressure.set_title("Pressures")
         ax_pressure.legend()
         ax_pressure.set_ylabel("ADC or Pa")
