@@ -71,3 +71,10 @@ if __name__ == "__main__":
         data = collect_data(config)
         print(data)  # Or handle logging/data saving here
         time.sleep(1)
+
+
+# Define read_all for external use
+_config = load_config()
+
+def read_all():
+    return collect_data(_config)
