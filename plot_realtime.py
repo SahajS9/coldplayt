@@ -1,39 +1,79 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-from matplotlib.animation import FuncAnimation
+import numpy as np
 import glob
 import os
-
-fig, ax = plt.subplots()
-data = pd.DataFrame()
+from matplotlib.animation import FuncAnimation
+import matplotlib.gridspec as gridspec
 
 def get_latest_csv():
-    """Find the most recently modified CSV file."""
-    csv_files = glob.glob("data_*.csv")
-    if not csv_files:
-        return None
-    latest = max(csv_files, key=os.path.getmtime)
-    return latest
+    files = glob.glob("data_*.csv")
+    return max(files, key=os.path.getmtime) if files else None
+
+fig = plt.figure(constrained_layout=True, figsize=(12, 8))
+gs = gridspec.GridSpec(2, 2, figure=fig)
+
+ax_temp = fig.add_subplot(gs[0, 0])
+ax_pressure = fig.add_subplot(gs[0, 1])
+ax_power = fig.add_subplot(gs[1, 0])
+ax_efficiency = fig.add_subplot(gs[1, 1])
+
+def compute_efficiency(row):
+    heater = row.get("heater_power")
+    pump = row.get("pump_power")
+    fluid_in = row.get("fluid_in")
+    fluid_out = row.get("fluid_out")
+    m_dot = 0.01  # adjust as needed
+    cp = 4180  # water
+    if pd.isna(heater) or pd.isna(fluid_in) or pd.isna(fluid_out):
+        return np.nan
+    q_dot = m_dot * cp * (fluid_in - fluid_out)
+    return q_dot / heater if heater else np.nan
 
 def animate(i):
-    global data
     latest_csv = get_latest_csv()
-    if latest_csv is None:
-        print("No CSV files found.")
+    if not latest_csv:
         return
+
     try:
-        data = pd.read_csv(latest_csv).tail(100)  # Limit to last 100 points
-        ax.clear()
-        ax.plot(data['timestamp'], data['fluid_in'], label="Fluid In")
-        ax.plot(data['timestamp'], data['fluid_out'], label="Fluid Out")
-        ax.legend()
-        ax.set_title("Real-Time Fluid Temperature")
-        ax.set_xlabel("Time")
-        ax.set_ylabel("Temp (°C)")
-        plt.xticks(rotation=45)
-        plt.tight_layout()
+        df = pd.read_csv(latest_csv).tail(100)
+        df['timestamp'] = pd.to_datetime(df['timestamp'])
+
+        # Efficiency
+        df['efficiency'] = df.apply(compute_efficiency, axis=1)
+
+        ax_temp.clear()
+        ax_temp.plot(df['timestamp'], df['fluid_in'], label="Fluid In")
+        ax_temp.plot(df['timestamp'], df['fluid_out'], label="Fluid Out")
+        ax_temp.set_title("Fluid Temperatures")
+        ax_temp.legend()
+        ax_temp.set_ylabel("°C")
+
+        ax_pressure.clear()
+        ax_pressure.plot(df['timestamp'], df['P_in'], label="P_in")
+        ax_pressure.plot(df['timestamp'], df['P_out'], label="P_out")
+        ax_pressure.set_title("Pressures")
+        ax_pressure.legend()
+        ax_pressure.set_ylabel("ADC or Pa")
+
+        ax_power.clear()
+        ax_power.scatter(df['pump_power'], df['heater_power'], alpha=0.6)
+        ax_power.set_xlabel("Pump Power")
+        ax_power.set_ylabel("Heater Power")
+        ax_power.set_title("Heater vs Pump Power")
+
+        ax_efficiency.clear()
+        ax_efficiency.plot(df['timestamp'], df['efficiency'], label="Efficiency")
+        ax_efficiency.set_ylim(0, 1)
+        ax_efficiency.set_ylabel("η (Thermal)")
+        ax_efficiency.set_title("System Efficiency")
+        ax_efficiency.legend()
+
+        for ax in [ax_temp, ax_pressure, ax_efficiency]:
+            ax.tick_params(axis='x', rotation=45)
+
     except Exception as e:
-        print(f"Error updating plot: {e}")
+        print(f"Plot error: {e}")
 
 ani = FuncAnimation(fig, animate, interval=1000)
 plt.show()
