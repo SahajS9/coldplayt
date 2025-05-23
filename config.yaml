@@ -20,3 +20,7 @@ calibration:
     adc_max: 1023.0 # ADC max reading (10-bit)
   pressure_scale: 0.1 # volts to bar
   voltage_ref: 3.3
+  adc_max: 1023
+  flow_rate_m3s: 0.0001 # Optional: used in pump power calc if not dynamically measured
+
+geometry: "flat_fins" # Optional: label for grouping runs by exchanger design
