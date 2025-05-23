@@ -9,7 +9,7 @@ sensors:
     in: 5
     out: 6
   heater_power: 7 # Optional
-  pump_power: 8 # Optional
+  pump_power: 7 # Optional
 
 calibration:
   thermistor:
