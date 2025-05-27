@@ -1,6 +1,6 @@
 # coldplayt
 
-Thermal-fluid data acquisition and analysis system using a Raspberry Pi and MCP3008 ADC.
+Thermal-fluid data acquisition and analysis system using a Raspberry Pi and MCP3008 ADCs.
 Used for finding the efficiency of a two-phase cold plate design for high-power chip cooling.
 
 ```
@@ -26,6 +26,10 @@ coldplayt/
 - Calibrate thermistors using either:
   - Steinhart-Hart coefficients in `config.yaml`
   - Reference thermocouple readings (if attached)
+- Change efficiency plot to be heat transfer vs. pump power
+  - Highest eff would be top left, and lowest efficiency would be bottom right.
+- Calculate heat and pump power with given inputs and equations
+- Calculate pumping cost as a unit of time per trial
 
 ---
 
@@ -122,7 +126,7 @@ python analyze.py myfile.csv     # Analyzes specified file
 
 ## Features
 
-- MCP3008 ADC integration for analog sensors
+- MCP3008 ADC integration for analog sensors (max of 16 channels)
 - Thermistor temperature conversion via Steinhart-Hart equation
 - Heat transfer and efficiency calculations
 - Optional heater and pump power analysis

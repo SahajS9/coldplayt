@@ -8,18 +8,6 @@ NumberOrSeries = Union[float, pd.Series]
 def adc_to_temperature(adc_value: Union[int, float], calibration: dict) -> Optional[float]:
     """
     Convert an ADC value to temperature (°C) using the Steinhart-Hart equation.
-
-    Parameters:
-        adc_value (int or float): Raw ADC value (0 to adc_max).
-        calibration (dict): Thermistor calibration settings, including:
-        - R_fixed (float): Fixed resistor value in ohms
-        - R_nominal (float): Nominal resistance at T_nominal
-        - T_nominal (float): Nominal temperature in °C
-        - beta (float): Beta coefficient
-        - adc_max (int): ADC resolution max (e.g., 1023)
-
-    Returns:
-        float or None: Temperature in Celsius or None for invalid readings.
     """
     R_fixed = calibration['R_fixed']
     R_nominal = calibration['R_nominal']
@@ -28,7 +16,7 @@ def adc_to_temperature(adc_value: Union[int, float], calibration: dict) -> Optio
     adc_max = calibration['adc_max']
 
     if adc_value == 0 or adc_value >= adc_max:
-        return None  # Avoid division by zero or invalid input
+        return None
 
     resistance = R_fixed / (adc_max / adc_value - 1)
     steinhart = np.log(resistance / R_nominal) / beta
@@ -37,76 +25,79 @@ def adc_to_temperature(adc_value: Union[int, float], calibration: dict) -> Optio
     return temperature_k - 273.15
 
 
-def calculate_heat_transfer(
-    m_dot: float,
-    cp: float,
-    temp_in: NumberOrSeries,
-    temp_out: NumberOrSeries
-) -> NumberOrSeries:
+def calculate_heat_transfer(m_dot: float, cp: float, temp_in: NumberOrSeries, temp_out: NumberOrSeries) -> NumberOrSeries:
     """
     Compute heat transfer rate using Q̇ = ṁ · cp · ΔT.
-
-    Parameters:
-        m_dot (float): Mass flow rate in kg/s
-        cp (float): Specific heat capacity in J/kg·K
-        temp_in (float or Series): Inlet temperature in °C
-        temp_out (float or Series): Outlet temperature in °C
-
-    Returns:
-        float or Series: Heat transfer rate in Watts
     """
     return m_dot * cp * (temp_in - temp_out)
 
 
-def calculate_pump_power(
-    flow_rate: float,
-    delta_p: NumberOrSeries
-) -> NumberOrSeries:
+def calculate_pump_power(flow_rate: float, delta_p: NumberOrSeries) -> NumberOrSeries:
     """
     Compute pump power using P = ΔP · Q.
-
-    Parameters:
-        flow_rate (float): Volumetric flow rate in m³/s
-        delta_p (float or Series): Pressure differential in Pascals
-
-    Returns:
-        float or Series: Pump power in Watts
     """
     return flow_rate * delta_p
 
 
-def calculate_heating_power(
-    voltage: Optional[float],
-    current: Optional[float]
-) -> Optional[float]:
+def calculate_pump_cost(pump_power: NumberOrSeries, electricity_rate: float = 0.12) -> NumberOrSeries:
+    """
+    Calculate cost of pump operation in $/day.
+    """
+    energy_kWh_per_s = pump_power / 1000.0
+    return energy_kWh_per_s * 3600 * 24 * electricity_rate
+
+
+def calculate_heating_power(voltage: Optional[float], current: Optional[float]) -> Optional[float]:
     """
     Compute electrical heating power.
-
-    Parameters:
-        voltage (float): Voltage in volts
-        current (float): Current in amperes
-
-    Returns:
-        float or None: Power in Watts
     """
     if voltage is None or current is None:
         return None
     return voltage * current
 
 
-def calculate_efficiency(
-    heating_power: NumberOrSeries,
-    heat_transferred: NumberOrSeries
-) -> NumberOrSeries:
+def calculate_efficiency(heating_power: NumberOrSeries, heat_transferred: NumberOrSeries) -> NumberOrSeries:
     """
     Calculate thermal efficiency η = Q̇_out / Q̇_in.
-
-    Parameters:
-        heating_power (float or Series): Input electrical power
-        heat_transferred (float or Series): Output heat rate to fluid
-
-    Returns:
-        float or Series: Efficiency ratio (0–1), or NaN where invalid
     """
     heating_power = np.where(heating_power == 0, np.nan, heating_power)
     return heat_transferred / heating_power
+
+
+def calculate_heat_flux(temp_top: NumberOrSeries, temp_bottom: NumberOrSeries, thickness: float, thermal_conductivity: float) -> NumberOrSeries:
+    """
+    Calculate heat flux using Fourier's Law: q = -k*(dT/dx).
+    """
+    return thermal_conductivity * (temp_top - temp_bottom) / thickness
+
+
+def calibrate_df(df: pd.DataFrame, config: dict) -> pd.DataFrame:
+    """
+    Apply all sensor calibrations to raw dataframe.
+    """
+    therm_cal = config['calibration']['thermistor']
+    adc_max = config['calibration'].get('adc_max', 1023)
+    flow_rate = config['calibration'].get('flow_rate_m3s', 0.0001)
+
+    for t_col in ['T1', 'T2', 'T3', 'fluid_in', 'fluid_out']:
+        if t_col in df:
+            df[f'{t_col}_C'] = df[t_col].apply(lambda x: adc_to_temperature(x * adc_max, therm_cal) if pd.notna(x) else np.nan)
+
+    if 'P_in' in df.columns and 'P_out' in df.columns:
+        df['delta_p'] = df['P_in'] - df['P_out']
+        df['pump_power'] = calculate_pump_power(flow_rate, df['delta_p'])
+        df['pump_cost_per_day'] = calculate_pump_cost(df['pump_power'])
+    else:
+        df['delta_p'] = df['pump_power'] = df['pump_cost_per_day'] = np.nan
+
+    m_dot = 0.01  # kg/s
+    cp = config.get('fluid_cp', 1090)  # Default: Flutec PP1
+
+    df['Q_dot'] = calculate_heat_transfer(m_dot, cp, df.get('fluid_in_C'), df.get('fluid_out_C'))
+
+    if 'heater_power' in df.columns:
+        df['efficiency'] = calculate_efficiency(df['heater_power'], df['Q_dot'])
+    else:
+        df['efficiency'] = np.nan
+
+    return df

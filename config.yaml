@@ -8,8 +8,8 @@ sensors:
   pressure:
     in: 4
     out: 5
-  heater_power: 7 # Optional
-  pump_power: 7 # Optional
+  heater_power: None # Optional
+  pump_power: None # Optional
 
 calibration:
   thermistor:
@@ -23,4 +23,4 @@ calibration:
   adc_max: 1023
   flow_rate_m3s: 0.0001 # Optional: used in pump power calc if not dynamically measured
 
-geometry: "flat_fins" # Optional: label for grouping runs by exchanger design
+geometry: "simple_fins" # Optional: label for grouping runs by exchanger design
