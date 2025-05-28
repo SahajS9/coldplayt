@@ -5,7 +5,7 @@ from typing import Union, Optional
 NumberOrSeries = Union[float, pd.Series]
 
 
-def adc_to_temperature(adc_value: Union[int, float], calibration: dict) -> Optional[float]:
+def temp_from_adc(adc_value: Union[int, float], calibration: dict) -> Optional[float]:
     """
     Convert an ADC value to temperature (°C) using the Steinhart-Hart equation.
     """
@@ -23,6 +23,24 @@ def adc_to_temperature(adc_value: Union[int, float], calibration: dict) -> Optio
     steinhart += 1.0 / (T_nominal + 273.15)
     temperature_k = 1.0 / steinhart
     return temperature_k - 273.15
+
+def pressure_from_adc(adc_value: Union[int, float], calibration: dict) -> Optional[float]:
+    """
+    Convert an ADC value to PSI by adjusting for voltage.
+    """
+    voltage_ref = calibration['voltage_ref']
+    adc_max = calibration['calibration']
+    voltage_min = calibration['V_min']
+    pressure_min = calibration['P_min']
+    pressure_max = calibration['V_max']
+    voltage_max = calibration['P_max']
+
+    if adc_value == 0 or adc_value >= adc_max:
+        return None
+    
+    voltage = adc_value * (5.0 / adc_max)
+    pressure = (voltage - 0.5) * 100
+    return pressure
 
 
 def calculate_heat_transfer(m_dot: float, cp: float, temp_in: NumberOrSeries, temp_out: NumberOrSeries) -> NumberOrSeries:
@@ -76,19 +94,20 @@ def calibrate_df(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     Apply all sensor calibrations to raw dataframe.
     """
     therm_cal = config['calibration']['thermistor']
-    adc_max = config['calibration'].get('adc_max', 1023)
+
     flow_rate = config['calibration'].get('flow_rate_m3s', 0.0001)
 
     for t_col in ['T1', 'T2', 'T3', 'fluid_in', 'fluid_out']:
         if t_col in df:
-            df[f'{t_col}_C'] = df[t_col].apply(lambda x: adc_to_temperature(x * adc_max, therm_cal) if pd.notna(x) else np.nan)
+            df[f'{t_col}_C'] = df[t_col].apply(lambda x: temp_from_adc(x, therm_cal) if pd.notna(x) else np.nan)
 
     if 'P_in' in df.columns and 'P_out' in df.columns:
-        df['delta_p'] = df['P_in'] - df['P_out']
-        df['pump_power'] = calculate_pump_power(flow_rate, df['delta_p'])
-        df['pump_cost_per_day'] = calculate_pump_cost(df['pump_power'])
+        df['delta_p'] = df['P_out'] - df['P_in']
+        df['pump_power_calc'] = calculate_pump_power(flow_rate, df['delta_p'])
+        df['pump_cost_per_day'] = calculate_pump_cost(df['pump_power_calc'])
     else:
-        df['delta_p'] = df['pump_power'] = df['pump_cost_per_day'] = np.nan
+        df['delta_p'] = df['pump_power_calc'] = df['pump_cost_per_day'] = np.nan
+
 
     m_dot = 0.01  # kg/s
     cp = config.get('fluid_cp', 1090)  # Default: Flutec PP1

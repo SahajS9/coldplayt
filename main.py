@@ -7,7 +7,7 @@ from datetime import datetime
 filename = f"data_{datetime.now().isoformat(timespec='seconds').replace(':', '.').replace('T','_')}.csv" 
 
 header = [
-    "timestamp", "T1", "T2", "T3", "fluid_in", "fluid_out", "P_in", "P_out",
+    "seconds", "T1", "T2", "T3", "fluid_in", "fluid_out", "P_in", "P_out",
     "heater_power", "pump_power"
 ]
 
@@ -17,14 +17,17 @@ with open(filename, "w", newline='') as f:
     f.flush()  # Ensure header is written immediately
     print(f"Now collecting data in {filename}")
     print(f"Run 'python plot_realtime.py' to view live metrics")
+    start_time = time.time() # Starts time for trial
     try:
         while True:
+            now = time.time()
+            delta_sec = round(now - start_time, 3)  # Time since start, in seconds
             readings = read_all()
-            row = [datetime.now().isoformat(timespec='milliseconds')] # HH:MM:SS.sss
+            row = [delta_sec]
             for key in header[1:]:
                 row.append(readings.get(key, None))  # Optional sensors filled with 'None'
             writer.writerow(row)
-            f.flush()  # Ensure row is written immediately
-            time.sleep(0.1) # Sleep for 100ms before looping
+            f.flush()
+            time.sleep(0.1)  # 100ms interval
     except KeyboardInterrupt:
         print("Stopped logging.")

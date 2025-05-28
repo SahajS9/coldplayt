@@ -18,9 +18,14 @@ calibration:
     T_nominal: 25.0 # Nominal temperature (°C)
     beta: 3950.0 # Beta coefficient
     adc_max: 1023.0 # ADC max reading (10-bit)
-  pressure_scale: 0.1 # volts to bar
+  pressure_transducer:
+    V_min: 0 # V
+    P_min: 0 # PSI | Lowest reading @ V_0
+    V_max: 4.5 # V
+    P_max: 200 # PSI | Highest reading @ V_max
+  # pressure_scale: 0.1 # volts to bar
   voltage_ref: 5
   adc_max: 1023
-  flow_rate_m3s: 0.0001 # Optional: used in pump power calc if not dynamically measured
+  flow_rate_m3s: 0.00000666667 # Optional: used in pump power calc if not dynamically measured
 
 geometry: "simple_fins" # Optional: label for grouping runs by exchanger design
