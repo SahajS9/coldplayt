@@ -4,7 +4,9 @@ from typing import Union, Optional
 
 NumberOrSeries = Union[float, pd.Series]
 
-
+# -----------------------------------------------------------------------------
+# Converts raw ADC sensor readings to calibrated values
+# -----------------------------------------------------------------------------
 def temp_from_adc(adc_value: Union[int, float], calibration: dict) -> Optional[float]:
     """
     Convert an ADC value to temperature (°C) using the Steinhart-Hart equation.
@@ -23,6 +25,7 @@ def temp_from_adc(adc_value: Union[int, float], calibration: dict) -> Optional[f
     steinhart += 1.0 / (T_nominal + 273.15)
     temperature_k = 1.0 / steinhart
     return temperature_k - 273.15
+
 
 def pressure_from_adc(adc_value: Union[int, float], calibration: dict) -> Optional[float]:
     """
@@ -43,6 +46,9 @@ def pressure_from_adc(adc_value: Union[int, float], calibration: dict) -> Option
     return pressure
 
 
+# -----------------------------------------------------------------------------
+# Calculations
+# -----------------------------------------------------------------------------
 def calculate_heat_transfer(m_dot: float, cp: float, temp_in: NumberOrSeries, temp_out: NumberOrSeries) -> NumberOrSeries:
     """
     Compute heat transfer rate using Q̇ = ṁ · cp · ΔT.
@@ -89,6 +95,9 @@ def calculate_heat_flux(temp_top: NumberOrSeries, temp_bottom: NumberOrSeries, t
     return thermal_conductivity * (temp_top - temp_bottom) / thickness
 
 
+# -----------------------------------------------------------------------------
+# Main function, does calibration then calculations
+# -----------------------------------------------------------------------------
 def calibrate_df(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     """
     Apply all sensor calibrations to raw dataframe.
@@ -107,7 +116,6 @@ def calibrate_df(df: pd.DataFrame, config: dict) -> pd.DataFrame:
         df['pump_cost_per_day'] = calculate_pump_cost(df['pump_power_calc'])
     else:
         df['delta_p'] = df['pump_power_calc'] = df['pump_cost_per_day'] = np.nan
-
 
     m_dot = 0.01  # kg/s
     cp = config.get('fluid_cp', 1090)  # Default: Flutec PP1

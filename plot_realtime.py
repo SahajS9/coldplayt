@@ -16,6 +16,7 @@ def get_latest_csv():
     files = glob.glob("data_*.csv")
     return max(files, key=os.path.getmtime) if files else None
 
+# Grid layout for 4 plots
 fig = plt.figure(constrained_layout=True, figsize=(12, 8))
 gs = gridspec.GridSpec(2, 2, figure=fig)
 
@@ -24,6 +25,9 @@ ax_pressure = fig.add_subplot(gs[0, 1])
 ax_power = fig.add_subplot(gs[1, 0])
 ax_efficiency = fig.add_subplot(gs[1, 1])
 
+# -----------------------------------------------------------------------------
+# Set up plots (animation for realtime view)
+# -----------------------------------------------------------------------------
 def animate(i):
     latest_csv = get_latest_csv()
     if not latest_csv:
@@ -76,6 +80,7 @@ def animate(i):
     except Exception as e:
         print(f"Plot error: {e}")
 
+# Execution
 print(f"Showing realtime plot using {get_latest_csv()}")
 ani = FuncAnimation(fig, animate, interval=100, save_count=100)
 plt.show()
