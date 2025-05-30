@@ -3,11 +3,11 @@ sensors:
     T1: 0
     T2: 1
     T3: 2
-    fluid_in: 6
-    fluid_out: 7
+    fluid_in: 5
+    fluid_out: 6
   pressure:
-    in: 4
-    out: 5
+    P_in: 3
+    P_out: 4
   heater_power: None # Optional
   pump_power: None # Optional
 
