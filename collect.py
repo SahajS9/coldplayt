@@ -25,12 +25,11 @@ def read_adc_channel(channel: int) -> int | None:
 
     Returns None if channel is on second chip but it isn't connected.
     """
-    if channel is not None and channel != "None":
-        channel = int(channel)
-    if not 0 <= channel <= 15:
+    if channel is None or not isinstance(channel, int):
+        return None  # or raise an error, depending on desired behavior
+
+    if channel < 0 or channel > 15:
         raise ValueError(f"Channel must be in range 0–15, got {channel}")
-    else:
-        channel = None  # or handle it however you want
 
     if channel < 8:
         spi = spi_0
