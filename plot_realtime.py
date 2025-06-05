@@ -55,7 +55,7 @@ def animate(i):
                 ax_pressure.plot(df['seconds'], df[label], label=label)
         ax_pressure.set_title("Pressures")
         ax_pressure.legend()
-        ax_pressure.set_ylabel("Pa")
+        ax_pressure.set_ylabel("psi")
 
         # Power plot
         ax_power.clear()

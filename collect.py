@@ -69,6 +69,17 @@ def collect_data(config: dict) -> dict:
         for label, channel in pressure_channels.items()
     }
 
+    # Optional fluid thermistors
+    fluid_channels = thermistor_channels
+    fluid_in = None
+    if 'fluid_in' in fluid_channels and fluid_channels['fluid_in'] not in [None, "none", "None"]:
+        fluid_in = read_adc_channel(fluid_channels['fluid_in'])
+
+    fluid_out = None
+    if 'fluid_out' in fluid_channels and fluid_channels['fluid_out'] not in [None, "none", "None"]:
+        fluid_out = read_adc_channel(fluid_channels['fluid_out'])
+
+    # Optional heat and pump power sensors
     heater_power = None
     if 'heater_power' in config['sensors']:
         heater_power = read_adc_channel(config['sensors']['heater_power'])
@@ -80,6 +91,8 @@ def collect_data(config: dict) -> dict:
     return {
         **temperatures,
         **pressures,
+        'fluid_in': fluid_in,
+        'fluid_out': fluid_out,
         'heater_power': heater_power,
         'pump_power': pump_power,
     }

@@ -23,8 +23,10 @@ calibration:
     P_min: 0 # PSI | Lowest reading @ V_0
     V_max: 4.5 # V
     P_max: 200 # PSI | Highest reading @ V_max
+    V_ref: 5
+    adc_max: 1023.0
   # pressure_scale: 0.1 # volts to bar
-  voltage_ref: 5
+  V_ref: 5
   adc_max: 1023
   flow_rate_m3s: 0.00000666667 # Optional: used in pump power calc if not dynamically measured
 

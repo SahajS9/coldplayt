@@ -30,20 +30,36 @@ def temp_from_adc(adc_value: Union[int, float], calibration: dict) -> Optional[f
 def pressure_from_adc(adc_value: Union[int, float], calibration: dict) -> Optional[float]:
     """
     Convert an ADC value to PSI by adjusting for voltage.
+    Pressure in the lab is about 14.6 psi fo reference.
+    
+    Parameters:
+        adc_value: Raw ADC integer (0–1023 for 10-bit)
+        adc_max: Max ADC value (default: 1023)
+        V_ref: ADC reference voltage (default: 5.0V)
+        p_range: Pressure range (default: 0–200 PSI)
+        V_min: Minimum sensor output voltage (default: 0.5V)
+        V_max: Maximum sensor output voltage (default: 4.5V)
+
+    Returns:
+        Pressure in PSI (float), or NaN if invalid
     """
-    voltage_ref = calibration['voltage_ref']
-    adc_max = calibration['calibration']
+    voltage_ref = calibration['V_ref']
+    adc_max = calibration['adc_max']
     voltage_min = calibration['V_min']
     pressure_min = calibration['P_min']
-    pressure_max = calibration['V_max']
-    voltage_max = calibration['P_max']
+    pressure_max = calibration['P_max']
+    voltage_max = calibration['V_max']
 
-    if adc_value == 0 or adc_value >= adc_max:
-        return None
-    
-    voltage = adc_value * (5.0 / adc_max)
-    pressure = (voltage - 0.5) * 100
-    return pressure
+    if adc_value is None or not (0 <= adc_value <= adc_max):
+        return float('nan')
+
+    voltage = (adc_value / adc_max) * voltage_ref
+    if voltage < voltage_min:
+        return pressure_min  # Below range
+    elif voltage > voltage_max:
+        return pressure_max  # Above range
+    else:
+        return ((voltage - voltage_min) / (voltage_max - voltage_min)) * pressure_max
 
 
 # -----------------------------------------------------------------------------
@@ -102,13 +118,17 @@ def calibrate_df(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     """
     Apply all sensor calibrations to raw dataframe.
     """
-    therm_cal = config['calibration']['thermistor']
-
+    thermistor_cal = config['calibration']['thermistor']
+    pressure_cal = config['calibration']['pressure_transducer']
     flow_rate = config['calibration'].get('flow_rate_m3s', 0.0001)
 
     for t_col in ['T1', 'T2', 'T3', 'fluid_in', 'fluid_out']:
         if t_col in df:
-            df[f'{t_col}_C'] = df[t_col].apply(lambda x: temp_from_adc(x, therm_cal) if pd.notna(x) else np.nan)
+            df[f'{t_col}_F'] = df[t_col].apply(lambda x: temp_from_adc(x, thermistor_cal) if pd.notna(x) else np.nan)
+    
+    for P_col in ['P_in', 'P_out']:
+        if P_col in df:
+            df[f'{P_col}_psi'] = df[P_col].apply(lambda x: pressure_from_adc(x, pressure_cal) if pd.notna(x) else np.nan)
 
     if 'P_in' in df.columns and 'P_out' in df.columns:
         df['delta_p'] = df['P_out'] - df['P_in']
@@ -120,7 +140,7 @@ def calibrate_df(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     m_dot = 0.01  # kg/s
     cp = config.get('fluid_cp', 1090)  # Default: Flutec PP1
 
-    df['Q_dot'] = calculate_heat_transfer(m_dot, cp, df.get('fluid_in_C'), df.get('fluid_out_C'))
+    df['Q_dot'] = calculate_heat_transfer(m_dot, cp, df.get('fluid_in_F'), df.get('fluid_out_F'))
 
     if 'heater_power' in df.columns:
         df['efficiency'] = calculate_efficiency(df['heater_power'], df['Q_dot'])
