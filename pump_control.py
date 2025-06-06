@@ -1,28 +1,31 @@
-import spidev
+import RPi.GPIO as GPIO
 import yaml
+import sys
+import time
 
 CONFIG_FILE = 'config.yaml'
+PWM_GPIO_PIN = 12  # BCM numbering
+PWM_FREQUENCY = 1000  # 1kHz
 
 class PumpController:
-    def __init__(self, spi_bus=0, spi_device=7, max_speed_hz=10000):
-        self.spi = spidev.SpiDev()
-        self.spi.open(spi_bus, spi_device)
-        self.spi.max_speed_hz = max_speed_hz
+    def __init__(self):
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(PWM_GPIO_PIN, GPIO.OUT)
+        self.pwm = GPIO.PWM(PWM_GPIO_PIN, PWM_FREQUENCY)
+        self.pwm.start(0)
         self.flow_rate = self.load_flow_rate()
 
     def set_pwm(self, duty_cycle):
-        """
-        Sets PWM duty cycle (0–100) to control pump speed.
-        """
         if not 0 <= duty_cycle <= 100:
             raise ValueError("Duty cycle must be between 0 and 100")
-        # Convert to byte and send via SPI
-        pwm_value = int(duty_cycle / 100 * 255)
-        self.spi.xfer2([pwm_value])
+        self.pwm.ChangeDutyCycle(duty_cycle)
 
     def save_flow_rate(self, rate):
-        with open(CONFIG_FILE, 'r') as f:
-            config = yaml.safe_load(f)
+        try:
+            with open(CONFIG_FILE, 'r') as f:
+                config = yaml.safe_load(f) or {}
+        except FileNotFoundError:
+            config = {}
         config['pump_flow_rate'] = rate
         with open(CONFIG_FILE, 'w') as f:
             yaml.safe_dump(config, f)
@@ -36,8 +39,27 @@ class PumpController:
         except FileNotFoundError:
             return 0.0
 
-# This can be used in other files as needed, an example is shown below:
-# from pump import PumpController
-# pump = PumpController()
-# pump.set_pwm(75)  # example duty cycle
-# pump.save_flow_rate(1.2)  # example flow rate in L/min
+    def cleanup(self):
+        self.pwm.stop()
+        GPIO.cleanup()
+
+# --- Run from command line ---
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print("Usage: python pump_control.py [duty_cycle 0–100]")
+        sys.exit(1)
+
+    try:
+        duty = float(sys.argv[1])
+    except ValueError:
+        print("Error: duty_cycle must be a number between 0 and 100.")
+        sys.exit(1)
+
+    pump = PumpController()
+    try:
+        pump.set_pwm(duty)
+        pump.save_flow_rate(duty)  # Optional: save speed as flow rate
+        print(f"Pump speed set to {duty}% duty cycle.")
+        time.sleep(2)  # Let it run briefly (you can change/remove this)
+    finally:
+        pump.cleanup()

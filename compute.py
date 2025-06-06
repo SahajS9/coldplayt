@@ -95,6 +95,10 @@ def calculate_heating_power(voltage: Optional[float], current: Optional[float]) 
         return None
     return voltage * current
 
+def calculate_heating_power_if_not_present(fluid_in: NumberOrSeries, fluid_out: NumberOrSeries) -> NumberOrSeries:
+    
+    
+
 
 def calculate_efficiency(heating_power: NumberOrSeries, heat_transferred: NumberOrSeries) -> NumberOrSeries:
     """
@@ -142,11 +146,12 @@ def calibrate_df(df: pd.DataFrame, config: dict) -> pd.DataFrame:
 
     if 'fluid_in' in df.columns and 'fluid_out' in df.columns:
         df['Q_dot'] = calculate_heat_transfer(m_dot, cp, df.get('fluid_in_F'), df.get('fluid_out_F'))
-        
+
 
     if 'heater_power' in df.columns:
         df['efficiency'] = calculate_efficiency(df['heater_power'], df['Q_dot'])
     else:
+        pressure_from_adc()
         df['efficiency'] = np.nan
 
     return df
