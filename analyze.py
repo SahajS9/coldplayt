@@ -76,7 +76,7 @@ for col in ['T1_F', 'T2_F', 'T3_F', 'fluid_in_F', 'fluid_out_F']:
     if col in df.columns:
         axs[0,0].plot(df['seconds'], df[col], label=col)
 axs[0,0].set_title("Temperature vs Time")
-axs[0,0].set_ylabel("Temperature (F)")
+axs[0,0].set_ylabel("°C")
 axs[0,0].legend()
 
 # Plot 2: Pressure vs Time
@@ -88,8 +88,8 @@ axs[0,1].set_ylabel("Pressure (Pa)")
 axs[0,1].legend()
 
 # Plot 3: Heat power vs pump power ( + efficiency)
-if 'Q_dot' in df.columns and 'pump_power' in df.columns:
-    sc = axs[1,0].scatter(df['pump_power'], df['Q_dot'], c=df['efficiency'], cmap='viridis', label='Efficiency')
+if 'Q_dot' in df.columns and 'pump_power_calc' in df.columns:
+    sc = axs[1,0].scatter(df['pump_power_calc'], df['heater_power'], alpha=0.6)
     axs[1,0].set_title("Heat Transfer Rate and Efficiency")
     axs[1,0].set_xlabel("Pump Power (W)")
     axs[1,0].set_ylabel("Heat Transfer Rate (W)")

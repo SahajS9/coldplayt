@@ -46,11 +46,11 @@ def animate(i):
                 ax_temp.plot(df['seconds'], df[label], label=label)
         ax_temp.set_title("Temperatures (Fluid + T1–T3)")
         ax_temp.legend()
-        ax_temp.set_ylabel("°F")
+        ax_temp.set_ylabel("°C")
 
         # Pressure plot
         ax_pressure.clear()
-        for label in ['P_in', 'P_out']:
+        for label in ['P_in_psi', 'P_out_psi']:
             if label in df:
                 ax_pressure.plot(df['seconds'], df[label], label=label)
         ax_pressure.set_title("Pressures")
@@ -59,8 +59,8 @@ def animate(i):
 
         # Power plot
         ax_power.clear()
-        if 'pump_power' in df and 'heater_power' in df:
-            ax_power.scatter(df['pump_power'], df['heater_power'], alpha=0.6)
+        if 'pump_power_calc' in df and 'heater_power_calc' in df:
+            ax_power.scatter(df['pump_power_calc'], df['heater_power'], alpha=0.6)
         ax_power.set_xlabel("Pump Power")
         ax_power.set_ylabel("Heater Power")
         ax_power.set_title("Heater vs Pump Power")

@@ -10,7 +10,7 @@ calibration:
     V_min: 0
     V_ref: 5
     adc_max: 1023.0
-  pump_power: 4.88
+  pump_power: 4.88 # W | Read from DC power supply
   thermistor:
     R_fixed: 100000.0
     R_nominal: 100000.0
