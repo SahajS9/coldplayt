@@ -24,6 +24,10 @@ ax_temp = fig.add_subplot(gs[0, 0])
 ax_pressure = fig.add_subplot(gs[0, 1])
 ax_power = fig.add_subplot(gs[1, 0])
 ax_efficiency = fig.add_subplot(gs[1, 1])
+ax_temp.grid(True)
+ax_pressure.grid(True)
+ax_power.grid(True)
+ax_efficiency.grid(True)
 
 # -----------------------------------------------------------------------------
 # Set up plots (animation for realtime view)
@@ -47,6 +51,8 @@ def animate(i):
         ax_temp.set_title("Temperatures (Fluid + T1–T3)")
         ax_temp.legend()
         ax_temp.set_ylabel("°C")
+        ax_temp.set_xlabel("Seconds")
+
 
         # Pressure plot
         ax_pressure.clear()
@@ -56,6 +62,8 @@ def animate(i):
         ax_pressure.set_title("Pressures")
         ax_pressure.legend()
         ax_pressure.set_ylabel("psi")
+        ax_pressure.set_xlabel("Seconds")
+
 
         # Power plot
         ax_power.clear()
@@ -73,6 +81,8 @@ def animate(i):
         ax_efficiency.set_ylabel("η (Thermal)")
         ax_efficiency.set_title("System Efficiency")
         ax_efficiency.legend()
+        ax_efficiency.set_xlabel("Seconds")
+
 
         for ax in [ax_temp, ax_pressure, ax_efficiency]:
             ax.tick_params(axis='x', rotation=45)
@@ -82,5 +92,5 @@ def animate(i):
 
 # Execution
 print(f"Showing realtime plot using {get_latest_csv()}")
-ani = FuncAnimation(fig, animate, frames=30, interval=10, save_count=100)
+ani = FuncAnimation(fig, animate, interval=100, save_count=100)
 plt.show()
