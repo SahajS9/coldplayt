@@ -1,8 +1,8 @@
 calibration:
   V_ref: 5
   adc_max: 1023
-  flow_rate_m3s: 6.66667e-06
-  heater_power: 200
+  flow_rate_m3s: 0
+  heater_power: 304.8 # W | Read by Shelly smart plug
   pressure_transducer:
     P_max: 200
     P_min: 0
@@ -19,6 +19,7 @@ calibration:
     beta: -19625.0
 flow_rate_m3s: 40.0
 geometry: simple_fins
+
 sensors:
   heater_power: None
   pressure:

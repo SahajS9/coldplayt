@@ -126,6 +126,8 @@ def calibrate_df(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     pressure_cal = config['calibration']['pressure_transducer']
     flow_rate = config['calibration'].get('flow_rate_m3s', 0.0001)
     pump_power = config['calibration'].get('pump_power')
+    m_dot = 0.01  # kg/s
+    cp = config.get('fluid_cp', 1090)  # Default: Flutec PP1
 
     for t_col in ['T1', 'T2', 'T3', 'fluid_in', 'fluid_out']:
         if t_col in df:
@@ -145,8 +147,7 @@ def calibrate_df(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     else:
         df['delta_p'] = df['pump_power_calc'] = df['pump_cost_per_day'] = np.nan
 
-    m_dot = 0.01  # kg/s
-    cp = config.get('fluid_cp', 1090)  # Default: Flutec PP1
+ 
 
     if 'fluid_in' in df.columns and 'fluid_out' in df.columns:
         df['Q_dot'] = calculate_heat_transfer(m_dot, cp, df.get('fluid_in_F'), df.get('fluid_out_F'))
