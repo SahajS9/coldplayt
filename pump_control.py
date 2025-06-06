@@ -29,8 +29,8 @@ class PumpController:
         except FileNotFoundError:
             config = {}
         config['flow_rate_m3s'] = rate
-        with open(CONFIG_FILE, 'w') as f:
-            yaml.safe_dump(config, f)
+        # with open(CONFIG_FILE, 'w') as f:
+            # yaml.safe_dump(config, f)
         self.flow_rate = rate
 
     def load_flow_rate(self):
