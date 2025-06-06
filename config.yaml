@@ -3,20 +3,20 @@ sensors:
     T1: 0
     T2: 1
     T3: 2
-    fluid_in: 5
-    fluid_out: 6
+    fluid_in: None # 5
+    fluid_out: None # 6
   pressure:
     P_in: 3
     P_out: 4
-  heater_power: None # Optional
-  pump_power: None # Optional
+  heater_power: 5 # Optional, originally none
+  pump_power: 6 # Optional, originally none
 
 calibration:
   thermistor:
-    R_fixed: 51000.0 # Fixed resistor value in ohms
+    R_fixed: 100000.0 # Fixed resistor value in ohms
     R_nominal: 100000.0 # Thermistor nominal resistance at 25C (ohms)
     T_nominal: 25.0 # Nominal temperature (°C)
-    beta: 3950.0 # Beta coefficient
+    beta: -19625.0 # Beta coefficient, 3950.0, beta value is ok now dont change
     adc_max: 1023.0 # ADC max reading (10-bit)
   pressure_transducer:
     V_min: 0 # V
