@@ -69,7 +69,7 @@ def animate(i):
         ax_efficiency.clear()
         if 'efficiency' in df:
             ax_efficiency.plot(df['seconds'], df['efficiency'], label="Efficiency")
-        ax_efficiency.set_ylim(0, 1)
+        ax_efficiency.set_ylim(0.5, 5)
         ax_efficiency.set_ylabel("η (Thermal)")
         ax_efficiency.set_title("System Efficiency")
         ax_efficiency.legend()
@@ -82,5 +82,5 @@ def animate(i):
 
 # Execution
 print(f"Showing realtime plot using {get_latest_csv()}")
-ani = FuncAnimation(fig, animate, frames=30, save_count=100)
+ani = FuncAnimation(fig, animate, frames=30, interval=10, save_count=100)
 plt.show()
