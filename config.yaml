@@ -1,34 +1,33 @@
+calibration:
+  V_ref: 5
+  adc_max: 1023
+  flow_rate_m3s: 6.66667e-06
+  heater_power: 200
+  pressure_transducer:
+    P_max: 200
+    P_min: 0
+    V_max: 4.5
+    V_min: 0
+    V_ref: 5
+    adc_max: 1023.0
+  pump_power: 4.88
+  thermistor:
+    R_fixed: 100000.0
+    R_nominal: 100000.0
+    T_nominal: 25.0
+    adc_max: 1023.0
+    beta: -19625.0
+flow_rate_m3s: 40.0
+geometry: simple_fins
 sensors:
+  heater_power: None
+  pressure:
+    P_in: 4
+    P_out: 3
+  pump_power: None
   thermistors:
     T1: 2
     T2: 0
     T3: 1
-    fluid_in: 6 # 5
-    fluid_out: 5 # 6
-  pressure:
-    P_in: 4
-    P_out: 3
-  heater_power: None # Optional: 'None'
-  pump_power: None # Optional: 'None'
-
-calibration:
-  thermistor:
-    R_fixed: 100000.0 # Fixed resistor value in ohms
-    R_nominal: 100000.0 # Thermistor nominal resistance at 25C (ohms)
-    T_nominal: 25.0 # Nominal temperature (°C)
-    beta: -19625.0 # Beta coefficient, 3950.0, beta value is ok now dont change
-    adc_max: 1023.0 # ADC max reading (10-bit)
-  pressure_transducer:
-    V_min: 0 # V
-    P_min: 0 # PSI | Lowest reading @ V_0
-    V_max: 4.5 # V
-    P_max: 200 # PSI | Highest reading @ V_max
-    V_ref: 5
-    adc_max: 1023.0
-  # pressure_scale: 0.1 # volts to bar
-  V_ref: 5
-  adc_max: 1023
-  flow_rate_m3s: 0.00000666667 # m^3/s | Optional: used in pump power calc if not dynamically measured
-  pump_power: 4.88 # W | Optional: If 'None' is specified, it will calculate from flow_rate_m3s, otherwise it will just use this value in compute.py
-  heater_power: 200
-geometry: "simple_fins" # Optional: label for grouping runs by exchanger design
+    fluid_in: 6
+    fluid_out: 5
