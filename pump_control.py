@@ -18,6 +18,8 @@ class PumpController:
     def set_pwm(self, duty_cycle):
         if not 0 <= duty_cycle <= 100:
             raise ValueError("Duty cycle must be between 0 and 100")
+        # Change duty cycle to work with pump by halving it
+        # duty_cycle = duty_cycle / 2 + 10
         self.pwm.ChangeDutyCycle(duty_cycle)
 
     def save_flow_rate(self, rate):

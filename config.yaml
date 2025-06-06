@@ -1,15 +1,15 @@
 sensors:
   thermistors:
-    T1: 0
-    T2: 1
-    T3: 2
-    fluid_in: None # 5
-    fluid_out: None # 6
+    T1: 2
+    T2: 0
+    T3: 1
+    fluid_in: 6 # 5
+    fluid_out: 5 # 6
   pressure:
-    P_in: 3
-    P_out: 4
-  heater_power: 5 # Optional, originally none
-  pump_power: 6 # Optional, originally none
+    P_in: 4
+    P_out: 3
+  heater_power: None # Optional: 'None'
+  pump_power: None # Optional: 'None'
 
 calibration:
   thermistor:
@@ -28,6 +28,7 @@ calibration:
   # pressure_scale: 0.1 # volts to bar
   V_ref: 5
   adc_max: 1023
-  flow_rate_m3s: 0.00000666667 # Optional: used in pump power calc if not dynamically measured
-
+  flow_rate_m3s: 0.00000666667 # m^3/s | Optional: used in pump power calc if not dynamically measured
+  pump_power: 4.88 # W | Optional: If 'None' is specified, it will calculate from flow_rate_m3s, otherwise it will just use this value in compute.py
+  heater_power: 200
 geometry: "simple_fins" # Optional: label for grouping runs by exchanger design

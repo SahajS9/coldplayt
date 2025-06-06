@@ -95,12 +95,10 @@ def calculate_heating_power(voltage: Optional[float], current: Optional[float]) 
         return None
     return voltage * current
 
-def calculate_heating_power_if_not_present() -> None:
+# def calculate_heating_power_if_not_present() -> None:
+#     return Q_dot = calculate_heat_transfer(m_dot, cp, df.get('fluid_in_F'), df.get('fluid_out_F'))
+#         # df['Q_dot'] = calculate_heat_transfer(m_dot, cp, df.get('fluid_in_F'), df.get('fluid_out_F'))
 
-    if 'fluid_in' in df.columns and 'fluid_out' in df.columns:
-        return Q_dot = calculate_heat_transfer(m_dot, cp, df.get(''))
-        df['Q_dot'] = calculate_heat_transfer(m_dot, cp, df.get('fluid_in_F'), df.get('fluid_out_F'))
-    
 
 def calculate_efficiency(heating_power: NumberOrSeries, heat_transferred: NumberOrSeries) -> NumberOrSeries:
     """
@@ -127,6 +125,7 @@ def calibrate_df(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     thermistor_cal = config['calibration']['thermistor']
     pressure_cal = config['calibration']['pressure_transducer']
     flow_rate = config['calibration'].get('flow_rate_m3s', 0.0001)
+    pump_power = config['calibration'].get('pump_power')
 
     for t_col in ['T1', 'T2', 'T3', 'fluid_in', 'fluid_out']:
         if t_col in df:
@@ -140,6 +139,9 @@ def calibrate_df(df: pd.DataFrame, config: dict) -> pd.DataFrame:
         df['delta_p'] = df['P_out'] - df['P_in']
         df['pump_power_calc'] = calculate_pump_power(flow_rate, df['delta_p'])
         df['pump_cost_per_day'] = calculate_pump_cost(df['pump_power_calc'])
+        if 'heater_power' in df.columns:
+            df['Q_dot'] = calculate_heat_transfer(m_dot, cp, df.get('fluid_in_F'), df.get('fluid_out_F'))
+            df['efficiency'] = calculate_efficiency(df['heater_power'], df['Q_dot'])
     else:
         df['delta_p'] = df['pump_power_calc'] = df['pump_cost_per_day'] = np.nan
 
@@ -149,12 +151,15 @@ def calibrate_df(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     if 'fluid_in' in df.columns and 'fluid_out' in df.columns:
         df['Q_dot'] = calculate_heat_transfer(m_dot, cp, df.get('fluid_in_F'), df.get('fluid_out_F'))
 
-
-    if 'heater_power' in df.columns:
-        df['efficiency'] = calculate_efficiency(df['heater_power'], df['Q_dot'])
-    else:
-        calculate_heating_power_if_not_present()
-        df['efficiency'] = calculate_efficiency(df['heater_power'], df['Q_dot'])
-        # df['efficiency'] = calculate_efficiency(df.get('heater_power_calc', np.nan), df['Q_dot'])
+    if 'pump_power' in df.columns:
+        df['pump_power_calc'] = pump_power
+        print(df['pump_power_calc'])
+        
+    # if 'heater_power' in df.columns:
+    #     df['efficiency'] = calculate_efficiency(df['heater_power'], df['Q_dot'])
+    # else:
+    #     # calculate_heating_power_if_not_present()
+    #     df['efficiency'] = calculate_efficiency(df['heater_power'], df['Q_dot'])
+    #     # df['efficiency'] = calculate_efficiency(df.get('heater_power_calc', np.nan), df['Q_dot'])
 
     return df
