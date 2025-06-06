@@ -140,7 +140,9 @@ def calibrate_df(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     m_dot = 0.01  # kg/s
     cp = config.get('fluid_cp', 1090)  # Default: Flutec PP1
 
-    df['Q_dot'] = calculate_heat_transfer(m_dot, cp, df.get('fluid_in_F'), df.get('fluid_out_F'))
+    if 'fluid_in' in df.columns and 'fluid_out' in df.columns:
+        df['Q_dot'] = calculate_heat_transfer(m_dot, cp, df.get('fluid_in_F'), df.get('fluid_out_F'))
+        
 
     if 'heater_power' in df.columns:
         df['efficiency'] = calculate_efficiency(df['heater_power'], df['Q_dot'])

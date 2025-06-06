@@ -41,12 +41,12 @@ def animate(i):
 
         # Temperature plot
         ax_temp.clear()
-        for label in ['fluid_in_C', 'fluid_out_C', 'T1_C', 'T2_C', 'T3_C']:
+        for label in ['fluid_in_F', 'fluid_out_F', 'T1_F', 'T2_F', 'T3_F']:
             if label in df:
                 ax_temp.plot(df['seconds'], df[label], label=label)
         ax_temp.set_title("Temperatures (Fluid + T1–T3)")
         ax_temp.legend()
-        ax_temp.set_ylabel("°C")
+        ax_temp.set_ylabel("°F")
 
         # Pressure plot
         ax_pressure.clear()
