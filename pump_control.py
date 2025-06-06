@@ -26,7 +26,7 @@ class PumpController:
                 config = yaml.safe_load(f) or {}
         except FileNotFoundError:
             config = {}
-        config['pump_flow_rate'] = rate
+        config['flow_rate_m3s'] = rate
         with open(CONFIG_FILE, 'w') as f:
             yaml.safe_dump(config, f)
         self.flow_rate = rate
@@ -35,7 +35,7 @@ class PumpController:
         try:
             with open(CONFIG_FILE, 'r') as f:
                 config = yaml.safe_load(f)
-            return config.get('pump_flow_rate', 0.0)
+            return config.get('flow_rate_m3s', 0.0)
         except FileNotFoundError:
             return 0.0
 
@@ -60,6 +60,6 @@ if __name__ == '__main__':
         pump.set_pwm(duty)
         pump.save_flow_rate(duty)  # Optional: save speed as flow rate
         print(f"Pump speed set to {duty}% duty cycle.")
-        time.sleep(2)  # Let it run briefly (you can change/remove this)
+        time.sleep(10)  # Let it run briefly (you can change/remove this)
     finally:
         pump.cleanup()
