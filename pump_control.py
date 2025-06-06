@@ -4,7 +4,7 @@ import yaml
 CONFIG_FILE = 'config.yaml'
 
 class PumpController:
-    def __init__(self, spi_bus=0, spi_device=0, max_speed_hz=5000):
+    def __init__(self, spi_bus=0, spi_device=7, max_speed_hz=10000):
         self.spi = spidev.SpiDev()
         self.spi.open(spi_bus, spi_device)
         self.spi.max_speed_hz = max_speed_hz
