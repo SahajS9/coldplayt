@@ -43,13 +43,13 @@ with open("config.yaml", "r") as f:
 # Apply sensor calibrations and compute metrics
 # -----------------------------------------------------------------------------
 df = calibrate_df(df, config)
-print("After calibration:\n", df[['pump_power', 'pump_power_calc', 'T1_C', 'T2_C', 'T3_C']].head())
+print("After calibration:\n", df[['P_in_psi', 'P_out_psi', 'T1_F', 'T2_F', 'T3_F']].head()) # Debug
 
 # -----------------------------------------------------------------------------
 # Calculate delta_T
 # -----------------------------------------------------------------------------
-if 'fluid_in_C' in df.columns and 'fluid_out_C' in df.columns:
-    df['delta_T'] = df['fluid_in_C'] - df['fluid_out_C']
+if 'fluid_in_F' in df.columns and 'fluid_out_F' in df.columns:
+    df['delta_T'] = df['fluid_in_F'] - df['fluid_out_F']
 
 # -----------------------------------------------------------------------------
 # Data processing
@@ -72,15 +72,15 @@ sns.set(style="whitegrid")
 fig, axs = plt.subplots(2, 2, figsize=(14, 10))
 
 # Plot 1: Temperature vs Time
-for col in ['T1_C', 'T2_C', 'T3_C', 'fluid_in_C', 'fluid_out_C']:
+for col in ['T1_F', 'T2_F', 'T3_F', 'fluid_in_F', 'fluid_out_F']:
     if col in df.columns:
         axs[0,0].plot(df['seconds'], df[col], label=col)
 axs[0,0].set_title("Temperature vs Time")
-axs[0,0].set_ylabel("Temperature (C)")
+axs[0,0].set_ylabel("Temperature (F)")
 axs[0,0].legend()
 
 # Plot 2: Pressure vs Time
-for col in ['P_in', 'P_out', 'delta_p']:
+for col in ['P_in_psi', 'P_out_psi', 'delta_p']:
     if col in df.columns:
         axs[0,1].plot(df['seconds'], df[col], label=col)
 axs[0,1].set_title("Pressure vs Time")
