@@ -60,7 +60,7 @@ def animate(i):
         # Power plot
         ax_power.clear()
         if 'pump_power_calc' in df and 'heater_power_calc' in df:
-            ax_power.scatter(df['pump_power_calc'], df['heater_power'], alpha=0.6)
+            ax_power.scatter(df['pump_power_calc'], df['heater_power_calc'], alpha=0.6)
         ax_power.set_xlabel("Pump Power")
         ax_power.set_ylabel("Heater Power")
         ax_power.set_title("Heater vs Pump Power")
