@@ -28,6 +28,6 @@ with open(filename, "w", newline='') as f:
                 row.append(readings.get(key, None))  # Optional sensors filled with 'None'
             writer.writerow(row)
             f.flush()
-            time.sleep(0.01)  # 100ms interval
+            time.sleep(0.1)  # 100ms interval
     except KeyboardInterrupt:
         print("Stopped logging.")
