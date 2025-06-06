@@ -82,5 +82,5 @@ def animate(i):
 
 # Execution
 print(f"Showing realtime plot using {get_latest_csv()}")
-ani = FuncAnimation(fig, animate, interval=10, save_count=100)
+ani = FuncAnimation(fig, animate, frame=10, interval=10, save_count=100)
 plt.show()
